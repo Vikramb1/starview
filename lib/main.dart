@@ -1,27 +1,16 @@
+// import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-// import 'package:sensors_plus/sensors_plus.dart';
 import 'package:motion_sensors/motion_sensors.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
+import 'package:fl_chart/fl_chart.dart';
 import 'dart:convert';
 import 'dart:async';
 
-Future<getPlanet> fetchPlanet() async {
-  final response = await http.get(Uri.parse('http://127.0.0.1:5000/planets'));
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return getPlanet.fromJson(jsonDecode(response.body));
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load planet data');
-  }
-}
-
-Future<getStar> fetchStar() async {
-  final response = await http.get(Uri.parse('http://127.0.0.1:5000/stars'));
-
+Future<getStar> fetchStar(String normal) async {
+  final response = await http.get(
+      Uri.parse('http://10.0.2.2:5000/stars?normal=' + normal),
+      headers: {"Keep-Alive": "timeout=5, max=1"});
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
@@ -33,36 +22,22 @@ Future<getStar> fetchStar() async {
   }
 }
 
-class getPlanet {
-  final dynamic dec;
-  final dynamic ra;
-
-  const getPlanet({
-    required this.dec,
-    required this.ra,
-  });
-
-  factory getPlanet.fromJson(Map<String, dynamic> json) {
-    return getPlanet(
-      dec: json['dec'],
-      ra: json['ra'],
-    );
-  }
-}
-
 class getStar {
   final dynamic x;
   final dynamic y;
+  final dynamic length;
 
   const getStar({
     required this.x,
     required this.y,
+    required this.length,
   });
 
   factory getStar.fromJson(Map<String, dynamic> json) {
     return getStar(
-      x: json['x'],
-      y: json['y'],
+      x: json['0'],
+      y: json['1'],
+      length: json.length,
     );
   }
 }
@@ -96,17 +71,40 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Vector3 _absoluteOrientation = Vector3.zero();
-  int duration = 1;
+  int duration = 15;
+  getStar? data;
+  List<double> arr = [1, 1, 1];
+  List<ScatterSpot>? spots;
 
   @override
   void initState() {
     super.initState();
-    // Timer.periodic(Duration(seconds: duration), (Timer t) => _getOrientation());
+    Timer.periodic(Duration(milliseconds: duration), (Timer t) => getData());
+  }
+
+  void getData() async {
     motionSensors.absoluteOrientation.listen((AbsoluteOrientationEvent event) {
       setState(() {
         _absoluteOrientation.setValues(event.yaw, event.pitch, event.roll);
       });
     });
+    _absoluteOrientation.copyIntoArray(arr, 0);
+    List<String> t = arr.map((el) => el.toString()).toList();
+    getStar data = await fetchStar(t.join(':'));
+    // print(t.join(''))
+    spots = plottedData(data);
+  }
+
+  List<ScatterSpot>? plottedData(var data) {
+    if (data?.x.length > 5) {
+      return List.generate(
+          data?.x.length,
+          (index) => ScatterSpot(
+              data?.x.values.toList()[index], data?.y.values.toList()[index],
+              color: Color.fromARGB(255, 255, 255, 255)));
+    } else {
+      return null;
+    }
   }
 
   @override
@@ -115,23 +113,23 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text(_absoluteOrientation.x.toStringAsFixed(4),
-                    style: TextStyle(fontSize: 25)),
-                Text(_absoluteOrientation.y.toStringAsFixed(4),
-                    style: TextStyle(fontSize: 25)),
-                Text(_absoluteOrientation.z.toStringAsFixed(4),
-                    style: TextStyle(fontSize: 25)),
-              ],
+      body: Card(
+          //   color: Color.fromARGB(255, 0, 0, 0),
+          //   child: Text(spots.toString(), style: TextStyle(color: Colors.white)),
+          // )
+          color: Color.fromARGB(255, 0, 0, 0),
+          child: ScatterChart(ScatterChartData(
+            scatterSpots: spots,
+            borderData: FlBorderData(
+              show: false,
             ),
-          ],
-        ),
-      ),
+            gridData: FlGridData(
+              show: false,
+            ),
+            titlesData: FlTitlesData(
+              show: false,
+            ),
+          ))),
     );
   }
 }
