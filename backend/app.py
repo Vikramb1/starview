@@ -18,15 +18,25 @@ def norm_stars():
     # star_json = json.load(open(r'C:\Users\vikra\starview_api\stars.json'))
     return testing.normalise_stars(normal)
 
+@app.route('/planets')
+def norm_planets():
+    normal = request.args.get('normal')
+    if normal == '0.0:0.0:0.0':
+        normal = '0.01:0.01:0.01'
+    normal = list(map(float, normal.split(':')))
+    # testing.normalise_stars(normal)
+    # star_json = json.load(open(r'C:\Users\vikra\starview_api\stars.json'))
+    return testing.normalise_planets(normal)
+
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=testing.update_data, trigger="interval", seconds=60)
 scheduler.start()
 
-@app.route('/planets')
-def load_planets():
-    testing.update_data()
-    planet_json = json.load(open(r'C:\Users\vikra\starview_api\planets.json'))
-    return planet_json
+# @app.route('/planets')
+# def load_planets():
+#     testing.update_data()
+#     planet_json = json.load(open(r'C:\Users\vikra\starview_api\planets.json'))
+#     return planet_json
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -22,14 +22,33 @@ Future<getStar> fetchStar(String normal) async {
   }
 }
 
+Future<getPlanet> fetchPlanet(String normal) async {
+  final response = await http.get(
+      Uri.parse('http://10.0.2.2:5000/planets?normal=' + normal),
+      headers: {"Keep-Alive": "timeout=5, max=1"});
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    return getPlanet.fromJson(jsonDecode(response.body));
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load star data');
+  }
+}
+
 class getStar {
   final dynamic x;
   final dynamic y;
+  final dynamic name;
+  final dynamic mag;
   final dynamic length;
 
   const getStar({
     required this.x,
     required this.y,
+    required this.name,
+    required this.mag,
     required this.length,
   });
 
@@ -37,6 +56,31 @@ class getStar {
     return getStar(
       x: json['0'],
       y: json['1'],
+      name: json['Name'],
+      mag: json['magnitude'],
+      length: json.length,
+    );
+  }
+}
+
+class getPlanet {
+  final dynamic x;
+  final dynamic y;
+  final dynamic name;
+  final dynamic length;
+
+  const getPlanet({
+    required this.x,
+    required this.y,
+    required this.name,
+    required this.length,
+  });
+
+  factory getPlanet.fromJson(Map<String, dynamic> json) {
+    return getPlanet(
+      x: json['0'],
+      y: json['1'],
+      name: json['Name'],
       length: json.length,
     );
   }
@@ -57,7 +101,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'StarView'),
     );
   }
 }
@@ -71,7 +115,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Vector3 _absoluteOrientation = Vector3.zero();
-  int duration = 15;
+  int duration = 10;
   getStar? data;
   List<double> arr = [1, 1, 1];
   List<ScatterSpot>? spots;
@@ -91,11 +135,11 @@ class _MyHomePageState extends State<MyHomePage> {
     _absoluteOrientation.copyIntoArray(arr, 0);
     List<String> t = arr.map((el) => el.toString()).toList();
     getStar data = await fetchStar(t.join(':'));
-    // print(t.join(''))
-    spots = plottedData(data);
+    getPlanet data2 = await fetchPlanet(t.join(':'));
+    spots = plottedData(data, data2);
   }
 
-  List<ScatterSpot>? plottedData(var data) {
+  List<ScatterSpot>? plottedData(var data, var data2) {
     if (data?.x.length > 5) {
       return List.generate(
           data?.x.length,
