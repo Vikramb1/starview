@@ -115,10 +115,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Vector3 _absoluteOrientation = Vector3.zero();
-  int duration = 10;
+  int duration = 250;
   getStar? data;
   List<double> arr = [1, 1, 1];
   List<ScatterSpot>? spots;
+  List<int> selected_spots = [];
+  List<String> labels = [];
+  String value = '';
 
   @override
   void initState() {
@@ -141,11 +144,50 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<ScatterSpot>? plottedData(var data, var data2) {
     if (data?.x.length > 5) {
-      return List.generate(
+      List<ScatterSpot> m = List.generate(
           data?.x.length,
           (index) => ScatterSpot(
               data?.x.values.toList()[index], data?.y.values.toList()[index],
-              color: Color.fromARGB(255, 255, 255, 255)));
+              color: Color.fromARGB(255, 255, 255, 255),
+              radius: (4 - data?.mag.values.toList()[index]).toDouble()));
+      m.add(ScatterSpot(-0.7, 1, show: false));
+      m.add(ScatterSpot(0.7, -1, show: false));
+      List<Color> planet_cols = [
+        // Color.fromARGB(255, 255, 255, 255),
+        // Color.fromARGB(255, 255, 255, 255),
+        // Color.fromARGB(255, 255, 255, 255),
+        // Color.fromARGB(255, 255, 255, 255),
+        // Color.fromARGB(255, 255, 255, 255),
+        // Color.fromARGB(255, 255, 255, 255),
+        // Color.fromARGB(255, 255, 255, 255),
+        Color.fromARGB(255, 219, 206, 202),
+        Color.fromARGB(255, 165, 124, 27),
+        Color.fromARGB(255, 69, 24, 4),
+        Color.fromARGB(255, 188, 175, 178),
+        Color.fromRGBO(234, 214, 184, 1),
+        Color.fromARGB(255, 209, 231, 231),
+        Color.fromARGB(255, 75, 112, 221),
+        Color.fromARGB(255, 254, 252, 215)
+      ];
+      List<double> sizes = [10, 13, 13, 20, 18, 15, 15, 23];
+      // List<ScatterSpot> m = List.generate(
+      //     data?.x.length,
+      //     (index) => ScatterSpot(
+      //         data?.x.values.toList()[index], data?.y.values.toList()[index],
+      //         color: Color.fromARGB(255, 255, 255, 255),
+      //         radius: (4 - data?.mag.values.toList()[index]).toDouble()));
+      List<ScatterSpot> p = List.generate(
+          data2?.x.length,
+          (index) => ScatterSpot(
+              data2?.x.values.toList()[index], data2?.y.values.toList()[index],
+              color: planet_cols[index], radius: sizes[index], show: true));
+      // List<ScatterSpot> p = [
+      //   ScatterSpot(0, 0, color: Color.fromARGB(255, 255, 255, 255), radius: 10)
+      // ];
+      labels = data?.name.values.toList() + data2?.name.values.toList();
+      List<ScatterSpot> combined = m + p;
+      // print(combined.length);
+      return combined;
     } else {
       return null;
     }
@@ -153,27 +195,109 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Card(
+    return AspectRatio(
+      aspectRatio: 1,
+      child: Card(
           //   color: Color.fromARGB(255, 0, 0, 0),
           //   child: Text(spots.toString(), style: TextStyle(color: Colors.white)),
           // )
           color: Color.fromARGB(255, 0, 0, 0),
-          child: ScatterChart(ScatterChartData(
-            scatterSpots: spots,
-            borderData: FlBorderData(
-              show: false,
+          child: ScatterChart(
+            ScatterChartData(
+              scatterSpots: spots,
+              borderData: FlBorderData(
+                show: false,
+              ),
+              gridData: FlGridData(
+                show: false,
+              ),
+              maxX: 0.7,
+              minX: -0.7,
+              minY: -1,
+              maxY: 1,
+              titlesData: FlTitlesData(
+                show: false,
+              ),
+              // showingTooltipIndicators: selected_spots,
+              // scatterTouchData: ScatterTouchData(
+              //     enabled: true,
+              //     handleBuiltInTouches: false,
+              //     mouseCursorResolver: (FlTouchEvent touchEvent,
+              //         ScatterTouchResponse? response) {
+              //       return response == null || response.touchedSpot == null
+              //           ? MouseCursor.defer
+              //           : SystemMouseCursors.click;
+              //     },
+              //     touchTooltipData: ScatterTouchTooltipData(
+              //       tooltipBgColor: Color.fromARGB(255, 255, 0, 0),
+              //       getTooltipItems: (ScatterSpot touchedBarSpot) {
+              //         print('here');
+              //         var nme = spots
+              //             ?.where((z) => z.x == touchedBarSpot.x)
+              //             .map((z) => spots?.indexOf(z))
+              //             .toList()[0];
+              //         if (nme == null) {
+              //           value = '';
+              //         } else {
+              //           value = labels[nme];
+              //         }
+              //         return ScatterTooltipItem(
+              //           value,
+              //           textStyle: TextStyle(
+              //             height: 1.2,
+              //             color: Colors.grey[100],
+              //             fontStyle: FontStyle.italic,
+              //           ),
+              //           //   bottomMargin: 10,
+              //           //   children: [
+              //           //     TextSpan(
+              //           //       text: '${touchedBarSpot.x.toInt()} \n',
+              //           //       style: const TextStyle(
+              //           //         color: Colors.white,
+              //           //         fontStyle: FontStyle.normal,
+              //           //         fontWeight: FontWeight.bold,
+              //           //       ),
+              //           //     ),
+              //           //     TextSpan(
+              //           //       text: 'Y: ',
+              //           //       style: TextStyle(
+              //           //         height: 1.2,
+              //           //         color: Colors.grey[100],
+              //           //         fontStyle: FontStyle.italic,
+              //           //       ),
+              //           //     ),
+              //           // TextSpan(
+              //           //   text: touchedBarSpot.y.toInt().toString(),
+              //           //   style: const TextStyle(
+              //           //     color: Colors.white,
+              //           //     fontStyle: FontStyle.normal,
+              //           //     fontWeight: FontWeight.bold,
+              //           //   ),
+              //           // ),
+              //         );
+              //       },
+              //     ),
+              //     touchCallback: (FlTouchEvent event,
+              //         ScatterTouchResponse? touchResponse) {
+              //       if (touchResponse == null ||
+              //           touchResponse.touchedSpot == null) {
+              //         return;
+              //       }
+              //       if (event is FlTapUpEvent) {
+              //         final sectionIndex =
+              //             touchResponse.touchedSpot!.spotIndex;
+              //         setState(() {
+              //           if (selected_spots.contains(sectionIndex)) {
+              //             selected_spots.remove(sectionIndex);
+              //           } else {
+              //             selected_spots.add(sectionIndex);
+              //           }
+              //         });
+              //       }
+              // })),
             ),
-            gridData: FlGridData(
-              show: false,
-            ),
-            titlesData: FlTitlesData(
-              show: false,
-            ),
-          ))),
+            swapAnimationDuration: Duration(milliseconds: 0),
+          )),
     );
   }
 }

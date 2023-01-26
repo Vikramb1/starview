@@ -3,6 +3,9 @@ import json
 app = Flask(__name__)
 import testing
 from apscheduler.schedulers.background import BackgroundScheduler
+# from werkzeug.middleware.profiler import ProfilerMiddleware
+
+# app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir='./profile')
 
 @app.route('/')
 def startup():
@@ -39,4 +42,4 @@ scheduler.start()
 #     return planet_json
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)
