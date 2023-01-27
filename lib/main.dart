@@ -115,12 +115,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Vector3 _absoluteOrientation = Vector3.zero();
-  int duration = 250;
+  int duration = 500;
   getStar? data;
   List<double> arr = [1, 1, 1];
   List<ScatterSpot>? spots;
   List<int> selected_spots = [];
-  List<String> labels = [];
+  List<dynamic> labels = [];
   String value = '';
 
   @override
@@ -184,7 +184,25 @@ class _MyHomePageState extends State<MyHomePage> {
       // List<ScatterSpot> p = [
       //   ScatterSpot(0, 0, color: Color.fromARGB(255, 255, 255, 255), radius: 10)
       // ];
-      labels = data?.name.values.toList() + data2?.name.values.toList();
+      // (data?.name as List).map((item) => item as String).toList();
+      // var a1 = (data?.name as List<dynamic>)
+      //     ?.map((dynamic item) => item as String)
+      //     ?.toList();
+      // var a1 = (data.name as List)?.map((e) => e as String)?.toList();
+      // var a1 = [...data.name];
+      // var a1 = Map<String, dynamic>.from(data.name).values.toList();
+      // var a2 = (data.name as List)?.map((item) => item as String)?.toList();
+      // print('HERE');
+      // print(a2.runtimeType);
+      // print([
+      //   data?.name.values.toList().runtimeType,
+      //   data2?.name.values.toList().runtimeType
+      // ]);
+      // try {
+      List<dynamic> a1 = data?.name.values.toList();
+      List<dynamic> a2 = data2?.name.values.toList();
+      labels = a1 + a2;
+      // } on Exception {}
       List<ScatterSpot> combined = m + p;
       // print(combined.length);
       return combined;
@@ -196,108 +214,114 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1,
-      child: Card(
+        aspectRatio: 1,
+        child: Card(
           //   color: Color.fromARGB(255, 0, 0, 0),
           //   child: Text(spots.toString(), style: TextStyle(color: Colors.white)),
           // )
           color: Color.fromARGB(255, 0, 0, 0),
           child: ScatterChart(
             ScatterChartData(
-              scatterSpots: spots,
-              borderData: FlBorderData(
-                show: false,
-              ),
-              gridData: FlGridData(
-                show: false,
-              ),
-              maxX: 0.7,
-              minX: -0.7,
-              minY: -1,
-              maxY: 1,
-              titlesData: FlTitlesData(
-                show: false,
-              ),
-              // showingTooltipIndicators: selected_spots,
-              // scatterTouchData: ScatterTouchData(
-              //     enabled: true,
-              //     handleBuiltInTouches: false,
-              //     mouseCursorResolver: (FlTouchEvent touchEvent,
-              //         ScatterTouchResponse? response) {
-              //       return response == null || response.touchedSpot == null
-              //           ? MouseCursor.defer
-              //           : SystemMouseCursors.click;
-              //     },
-              //     touchTooltipData: ScatterTouchTooltipData(
-              //       tooltipBgColor: Color.fromARGB(255, 255, 0, 0),
-              //       getTooltipItems: (ScatterSpot touchedBarSpot) {
-              //         print('here');
-              //         var nme = spots
-              //             ?.where((z) => z.x == touchedBarSpot.x)
-              //             .map((z) => spots?.indexOf(z))
-              //             .toList()[0];
-              //         if (nme == null) {
-              //           value = '';
-              //         } else {
-              //           value = labels[nme];
-              //         }
-              //         return ScatterTooltipItem(
-              //           value,
-              //           textStyle: TextStyle(
-              //             height: 1.2,
-              //             color: Colors.grey[100],
-              //             fontStyle: FontStyle.italic,
-              //           ),
-              //           //   bottomMargin: 10,
-              //           //   children: [
-              //           //     TextSpan(
-              //           //       text: '${touchedBarSpot.x.toInt()} \n',
-              //           //       style: const TextStyle(
-              //           //         color: Colors.white,
-              //           //         fontStyle: FontStyle.normal,
-              //           //         fontWeight: FontWeight.bold,
-              //           //       ),
-              //           //     ),
-              //           //     TextSpan(
-              //           //       text: 'Y: ',
-              //           //       style: TextStyle(
-              //           //         height: 1.2,
-              //           //         color: Colors.grey[100],
-              //           //         fontStyle: FontStyle.italic,
-              //           //       ),
-              //           //     ),
-              //           // TextSpan(
-              //           //   text: touchedBarSpot.y.toInt().toString(),
-              //           //   style: const TextStyle(
-              //           //     color: Colors.white,
-              //           //     fontStyle: FontStyle.normal,
-              //           //     fontWeight: FontWeight.bold,
-              //           //   ),
-              //           // ),
-              //         );
-              //       },
-              //     ),
-              //     touchCallback: (FlTouchEvent event,
-              //         ScatterTouchResponse? touchResponse) {
-              //       if (touchResponse == null ||
-              //           touchResponse.touchedSpot == null) {
-              //         return;
-              //       }
-              //       if (event is FlTapUpEvent) {
-              //         final sectionIndex =
-              //             touchResponse.touchedSpot!.spotIndex;
-              //         setState(() {
-              //           if (selected_spots.contains(sectionIndex)) {
-              //             selected_spots.remove(sectionIndex);
-              //           } else {
-              //             selected_spots.add(sectionIndex);
-              //           }
-              //         });
-              //       }
-              // })),
-            ),
+                scatterSpots: spots,
+                borderData: FlBorderData(
+                  show: false,
+                ),
+                gridData: FlGridData(
+                  show: false,
+                ),
+                maxX: 0.7,
+                minX: -0.7,
+                minY: -1,
+                maxY: 1,
+                titlesData: FlTitlesData(
+                  show: false,
+                ),
+                showingTooltipIndicators: selected_spots,
+                scatterTouchData: ScatterTouchData(
+                    enabled: true,
+                    handleBuiltInTouches: false,
+                    mouseCursorResolver: (FlTouchEvent touchEvent,
+                        ScatterTouchResponse? response) {
+                      return response == null || response.touchedSpot == null
+                          ? MouseCursor.defer
+                          : SystemMouseCursors.click;
+                    },
+                    touchTooltipData: ScatterTouchTooltipData(
+                      tooltipBgColor: Color.fromARGB(255, 255, 0, 0),
+                      getTooltipItems: (ScatterSpot touchedBarSpot) {
+                        // print(touchedBarSpot.x);
+                        var nme = spots
+                            ?.where(
+                                (z) => (z.x - touchedBarSpot.x).abs() <= 0.001)
+                            .map((z) => spots?.indexOf(z))
+                            .toList();
+                        // print(nme);
+                        //     .toList()[0];
+                        int? value;
+                        if (nme == null) {
+                          value = 0;
+                        } else {
+                          value = labels[nme[0]];
+                        }
+                        // print(touchedBarSpot.x);
+                        // value = labels[nme[0]];
+                        return ScatterTooltipItem(
+                          value.toString(),
+                          textStyle: TextStyle(
+                            height: 1.2,
+                            color: Colors.grey[100],
+                            fontStyle: FontStyle.italic,
+                          ),
+                          //   bottomMargin: 10,
+                          //   children: [
+                          //     TextSpan(
+                          //       text: '${touchedBarSpot.x.toInt()} \n',
+                          //       style: const TextStyle(
+                          //         color: Colors.white,
+                          //         fontStyle: FontStyle.normal,
+                          //         fontWeight: FontWeight.bold,
+                          //       ),
+                          //     ),
+                          //     TextSpan(
+                          //       text: 'Y: ',
+                          //       style: TextStyle(
+                          //         height: 1.2,
+                          //         color: Colors.grey[100],
+                          //         fontStyle: FontStyle.italic,
+                          //       ),
+                          //     ),
+                          // TextSpan(
+                          //   text: touchedBarSpot.y.toInt().toString(),
+                          //   style: const TextStyle(
+                          //     color: Colors.white,
+                          //     fontStyle: FontStyle.normal,
+                          //     fontWeight: FontWeight.bold,
+                          //   ),
+                          // ),
+                        );
+                      },
+                    ),
+                    touchCallback: (FlTouchEvent event,
+                        ScatterTouchResponse? touchResponse) {
+                      if (touchResponse == null ||
+                          touchResponse.touchedSpot == null) {
+                        return;
+                      }
+                      if (event is FlTapUpEvent) {
+                        final sectionIndex =
+                            touchResponse.touchedSpot!.spotIndex;
+                        setState(() {
+                          if (selected_spots.contains(sectionIndex)) {
+                            selected_spots.remove(sectionIndex);
+                          } else {
+                            selected_spots.add(sectionIndex);
+                          }
+                        });
+                      }
+                    })),
             swapAnimationDuration: Duration(milliseconds: 0),
-          )),
-    );
+          ),
+        ));
+    // );
   }
 }
