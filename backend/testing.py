@@ -35,7 +35,6 @@ def update_data():
     # astrometric_stars = earth.at(t).observe(bright_stars)
     # ra, dec, distance = astrometric_stars.radec()
     Simbad.add_votable_fields('typed_id')
-    # sr = Simbad.query_objectids(f"HIP32349")
     k = []
     for i, v in enumerate(star_pass.index.tolist()):
         t = 1
@@ -80,9 +79,6 @@ def normalise_planets(normal):
         - np.cos(dec_0*np.pi/180)*np.sin(planetdec*np.pi/180))/denom
     final = pd.concat([X,Y, planetname], axis = 1)
     final = final[(abs(final[0]) < 1) & (abs(final[1]) < 1)]
-    # plt.scatter(final[0],final[1])
-    # plt.show()
-    # return final
     return final.to_json()
 
 def normalise_stars(normal):

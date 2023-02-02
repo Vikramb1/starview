@@ -8,9 +8,8 @@ import 'dart:convert';
 import 'dart:async';
 
 Future<getStar> fetchStar(String normal) async {
-  final response = await http.get(
-      Uri.parse('http://10.0.2.2:5000/stars?normal=' + normal),
-      headers: {"Keep-Alive": "timeout=5, max=1"});
+  final response =
+      await http.get(Uri.parse('http://10.0.2.2:5000/stars?normal=' + normal));
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
@@ -23,9 +22,8 @@ Future<getStar> fetchStar(String normal) async {
 }
 
 Future<getPlanet> fetchPlanet(String normal) async {
-  final response = await http.get(
-      Uri.parse('http://10.0.2.2:5000/planets?normal=' + normal),
-      headers: {"Keep-Alive": "timeout=5, max=1"});
+  final response = await http
+      .get(Uri.parse('http://10.0.2.2:5000/planets?normal=' + normal));
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
@@ -97,7 +95,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'StarView',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -153,13 +151,6 @@ class _MyHomePageState extends State<MyHomePage> {
       m.add(ScatterSpot(-0.7, 1, show: false));
       m.add(ScatterSpot(0.7, -1, show: false));
       List<Color> planet_cols = [
-        // Color.fromARGB(255, 255, 255, 255),
-        // Color.fromARGB(255, 255, 255, 255),
-        // Color.fromARGB(255, 255, 255, 255),
-        // Color.fromARGB(255, 255, 255, 255),
-        // Color.fromARGB(255, 255, 255, 255),
-        // Color.fromARGB(255, 255, 255, 255),
-        // Color.fromARGB(255, 255, 255, 255),
         Color.fromARGB(255, 219, 206, 202),
         Color.fromARGB(255, 165, 124, 27),
         Color.fromARGB(255, 69, 24, 4),
@@ -170,12 +161,6 @@ class _MyHomePageState extends State<MyHomePage> {
         Color.fromARGB(255, 254, 252, 215)
       ];
       List<double> sizes = [10, 13, 13, 20, 18, 15, 15, 23];
-      // List<ScatterSpot> m = List.generate(
-      //     data?.x.length,
-      //     (index) => ScatterSpot(
-      //         data?.x.values.toList()[index], data?.y.values.toList()[index],
-      //         color: Color.fromARGB(255, 255, 255, 255),
-      //         radius: (4 - data?.mag.values.toList()[index]).toDouble()));
       List<ScatterSpot> p = List.generate(
           data2?.x.length,
           (index) => ScatterSpot(
@@ -202,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
       List<dynamic> a1 = data?.name.values.toList();
       List<dynamic> a2 = data2?.name.values.toList();
       labels = a1 + a2;
-      // } on Exception {}
+      labels.add('Unknown');
       List<ScatterSpot> combined = m + p;
       // print(combined.length);
       return combined;
@@ -250,23 +235,25 @@ class _MyHomePageState extends State<MyHomePage> {
                       tooltipBgColor: Color.fromARGB(255, 255, 0, 0),
                       getTooltipItems: (ScatterSpot touchedBarSpot) {
                         // print(touchedBarSpot.x);
-                        var nme = spots
+                        int? nme = spots
                             ?.where(
                                 (z) => (z.x - touchedBarSpot.x).abs() <= 0.001)
                             .map((z) => spots?.indexOf(z))
-                            .toList();
-                        // print(nme);
-                        //     .toList()[0];
-                        int? value;
-                        if (nme == null) {
-                          value = 0;
-                        } else {
-                          value = labels[nme[0]];
-                        }
-                        // print(touchedBarSpot.x);
-                        // value = labels[nme[0]];
+                            .toList()[0];
+                        int ind = nme ?? -1;
+                        // if (nme == null) {
+                        //   value = 0;
+                        // } else {
+                        //   value = labels[nme];
+                        // }
+                        // String fin = value.toString();
+                        // String fin = '$value';
+                        // print(fin);
+                        // value = labels[nme[0]];'
+                        value = labels[ind];
+                        // print(value);
                         return ScatterTooltipItem(
-                          value.toString(),
+                          value,
                           textStyle: TextStyle(
                             height: 1.2,
                             color: Colors.grey[100],

@@ -17,8 +17,6 @@ def norm_stars():
     if normal == '0.0:0.0:0.0':
         normal = '0.01:0.01:0.01'
     normal = list(map(float, normal.split(':')))
-    # testing.normalise_stars(normal)
-    # star_json = json.load(open(r'C:\Users\vikra\starview_api\stars.json'))
     return testing.normalise_stars(normal)
 
 @app.route('/planets')
@@ -27,8 +25,6 @@ def norm_planets():
     if normal == '0.0:0.0:0.0':
         normal = '0.01:0.01:0.01'
     normal = list(map(float, normal.split(':')))
-    # testing.normalise_stars(normal)
-    # star_json = json.load(open(r'C:\Users\vikra\starview_api\stars.json'))
     return testing.normalise_planets(normal)
 
 scheduler = BackgroundScheduler()
