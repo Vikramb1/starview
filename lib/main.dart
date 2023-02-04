@@ -8,8 +8,13 @@ import 'dart:convert';
 import 'dart:async';
 
 Future<getStar> fetchStar(String normal) async {
-  final response =
-      await http.get(Uri.parse('http://10.0.2.2:5000/stars?normal=' + normal));
+  final url = Uri.parse('http://10.0.2.2:5000/stars?normal=' + normal);
+  final Map<String, String> httpHeaders = {
+    // "Connection": "Keep-Alive",
+    // "Keep-Alive": "timeout=1, max=1"
+  };
+  final response = await http.get(url, headers: httpHeaders);
+
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
@@ -22,8 +27,14 @@ Future<getStar> fetchStar(String normal) async {
 }
 
 Future<getPlanet> fetchPlanet(String normal) async {
-  final response = await http
-      .get(Uri.parse('http://10.0.2.2:5000/planets?normal=' + normal));
+  final url = Uri.parse('http://10.0.2.2:5000/planets?normal=' + normal);
+  final Map<String, String> httpHeaders = {
+    // "Connection": "Keep-Alive",
+    // "Keep-Alive": "timeout=1, max=1"
+  };
+  final response = await http.get(url, headers: httpHeaders);
+  // final response = await http
+  //     .get(Uri.parse('http://10.0.2.2:5000/planets?normal=' + normal));
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
@@ -138,6 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
     getStar data = await fetchStar(t.join(':'));
     getPlanet data2 = await fetchPlanet(t.join(':'));
     spots = plottedData(data, data2);
+    // print('called');
   }
 
   List<ScatterSpot>? plottedData(var data, var data2) {
@@ -147,49 +159,44 @@ class _MyHomePageState extends State<MyHomePage> {
           (index) => ScatterSpot(
               data?.x.values.toList()[index], data?.y.values.toList()[index],
               color: Color.fromARGB(255, 255, 255, 255),
-              radius: (4 - data?.mag.values.toList()[index]).toDouble()));
-      m.add(ScatterSpot(-0.7, 1, show: false));
-      m.add(ScatterSpot(0.7, -1, show: false));
-      List<Color> planet_cols = [
-        Color.fromARGB(255, 219, 206, 202),
-        Color.fromARGB(255, 165, 124, 27),
-        Color.fromARGB(255, 69, 24, 4),
-        Color.fromARGB(255, 188, 175, 178),
-        Color.fromRGBO(234, 214, 184, 1),
-        Color.fromARGB(255, 209, 231, 231),
-        Color.fromARGB(255, 75, 112, 221),
-        Color.fromARGB(255, 254, 252, 215)
-      ];
-      List<double> sizes = [10, 13, 13, 20, 18, 15, 15, 23];
+              radius: (4.5 - data?.mag.values.toList()[index]).toDouble()));
+      // m.add(ScatterSpot(-0.7, 1, show: false));
+      // m.add(ScatterSpot(0.7, -1, show: false));
+      var planetsCol = {
+        'mercury': Color.fromARGB(255, 219, 206, 202),
+        'venus': Color.fromARGB(255, 165, 124, 27),
+        'mars': Color.fromARGB(255, 69, 24, 4),
+        'jupiter': Color.fromARGB(255, 188, 175, 178),
+        'saturn': Color.fromRGBO(234, 214, 184, 1),
+        'uranus': Color.fromARGB(255, 209, 231, 231),
+        'neptune': Color.fromARGB(255, 75, 112, 221),
+        'moon': Color.fromARGB(255, 254, 252, 215)
+      };
+      var planetsSize = {
+        'mercury': 10,
+        'venus': 13,
+        'mars': 13,
+        'jupiter': 20,
+        'saturn': 18,
+        'uranus': 15,
+        'neptune': 15,
+        'moon': 23
+      };
       List<ScatterSpot> p = List.generate(
           data2?.x.length,
           (index) => ScatterSpot(
               data2?.x.values.toList()[index], data2?.y.values.toList()[index],
-              color: planet_cols[index], radius: sizes[index], show: true));
-      // List<ScatterSpot> p = [
-      //   ScatterSpot(0, 0, color: Color.fromARGB(255, 255, 255, 255), radius: 10)
-      // ];
-      // (data?.name as List).map((item) => item as String).toList();
-      // var a1 = (data?.name as List<dynamic>)
-      //     ?.map((dynamic item) => item as String)
-      //     ?.toList();
-      // var a1 = (data.name as List)?.map((e) => e as String)?.toList();
-      // var a1 = [...data.name];
-      // var a1 = Map<String, dynamic>.from(data.name).values.toList();
-      // var a2 = (data.name as List)?.map((item) => item as String)?.toList();
-      // print('HERE');
-      // print(a2.runtimeType);
-      // print([
-      //   data?.name.values.toList().runtimeType,
-      //   data2?.name.values.toList().runtimeType
-      // ]);
-      // try {
+              color:
+                  planetsCol[data2?.name.values.toList()[index].toLowerCase()],
+              radius:
+                  planetsSize[data2.name.values.toList()[index].toLowerCase()]
+                      ?.toDouble(),
+              show: true));
       List<dynamic> a1 = data?.name.values.toList();
       List<dynamic> a2 = data2?.name.values.toList();
       labels = a1 + a2;
       labels.add('Unknown');
       List<ScatterSpot> combined = m + p;
-      // print(combined.length);
       return combined;
     } else {
       return null;
@@ -201,9 +208,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return AspectRatio(
         aspectRatio: 1,
         child: Card(
-          //   color: Color.fromARGB(255, 0, 0, 0),
-          //   child: Text(spots.toString(), style: TextStyle(color: Colors.white)),
-          // )
           color: Color.fromARGB(255, 0, 0, 0),
           child: ScatterChart(
             ScatterChartData(
@@ -232,26 +236,20 @@ class _MyHomePageState extends State<MyHomePage> {
                           : SystemMouseCursors.click;
                     },
                     touchTooltipData: ScatterTouchTooltipData(
-                      tooltipBgColor: Color.fromARGB(255, 255, 0, 0),
+                      tooltipBgColor: Color.fromARGB(255, 184, 174, 174),
                       getTooltipItems: (ScatterSpot touchedBarSpot) {
                         // print(touchedBarSpot.x);
+                        // int? nme = spots
+                        //     ?.where((z) => (z.x - touchedBarSpot.x).abs() <= 0)
+                        //     .map((z) => spots?.indexOf(z))
+                        //     .toList()[0];
                         int? nme = spots
-                            ?.where(
-                                (z) => (z.x - touchedBarSpot.x).abs() <= 0.001)
+                            ?.where((z) => (z.x - touchedBarSpot.x).abs() == 0)
                             .map((z) => spots?.indexOf(z))
                             .toList()[0];
-                        int ind = nme ?? -1;
-                        // if (nme == null) {
-                        //   value = 0;
-                        // } else {
-                        //   value = labels[nme];
-                        // }
-                        // String fin = value.toString();
-                        // String fin = '$value';
-                        // print(fin);
-                        // value = labels[nme[0]];'
+                        int ind = nme ?? labels.length - 1;
+                        // print(ind);
                         value = labels[ind];
-                        // print(value);
                         return ScatterTooltipItem(
                           value,
                           textStyle: TextStyle(
@@ -259,32 +257,6 @@ class _MyHomePageState extends State<MyHomePage> {
                             color: Colors.grey[100],
                             fontStyle: FontStyle.italic,
                           ),
-                          //   bottomMargin: 10,
-                          //   children: [
-                          //     TextSpan(
-                          //       text: '${touchedBarSpot.x.toInt()} \n',
-                          //       style: const TextStyle(
-                          //         color: Colors.white,
-                          //         fontStyle: FontStyle.normal,
-                          //         fontWeight: FontWeight.bold,
-                          //       ),
-                          //     ),
-                          //     TextSpan(
-                          //       text: 'Y: ',
-                          //       style: TextStyle(
-                          //         height: 1.2,
-                          //         color: Colors.grey[100],
-                          //         fontStyle: FontStyle.italic,
-                          //       ),
-                          //     ),
-                          // TextSpan(
-                          //   text: touchedBarSpot.y.toInt().toString(),
-                          //   style: const TextStyle(
-                          //     color: Colors.white,
-                          //     fontStyle: FontStyle.normal,
-                          //     fontWeight: FontWeight.bold,
-                          //   ),
-                          // ),
                         );
                       },
                     ),
@@ -306,7 +278,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
                       }
                     })),
-            swapAnimationDuration: Duration(milliseconds: 0),
+            swapAnimationDuration: Duration(milliseconds: 30),
           ),
         ));
     // );

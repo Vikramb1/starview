@@ -25,7 +25,7 @@ def update_data():
         pl = planets[v]
         astrometric_pl = earth.at(t).observe(pl)
         ra, dec, distance = astrometric_pl.radec()
-        selected_planets.append([v.split(' ')[0],ra.hours,dec.degrees])
+        selected_planets.append([v.split(' ')[0][0] + v.split(' ')[0][1:].lower() ,ra.hours,dec.degrees])
 
     with load.open(hipparcos.URL) as f:
         df = hipparcos.load_dataframe(f)
@@ -45,7 +45,7 @@ def update_data():
                 t = 0
                 break
         if t == 1:
-            k.append(' ')
+            k.append(sr['ID'][0])
     # print(len(star_pass), len(k))
     star_pass['Name'] = pd.Series(k).values
     # star_pass.set_index('Name', inplace=True)
@@ -106,7 +106,7 @@ def normalise_stars(normal):
     # field_rotation = np.pi
 
     denom = np.cos(dec_0*np.pi/180)*np.cos(stardec*np.pi/180)*np.cos(starra*np.pi/180 - ra_0*np.pi/180)\
-         + np.sin(stardec*np.pi/180)*np.sin(dec_0*np.pi/180)
+        + np.sin(stardec*np.pi/180)*np.sin(dec_0*np.pi/180)
     X = np.cos(stardec*np.pi/180)*np.sin(starra*np.pi/180 - ra_0*np.pi/180)/denom
     Y = (np.sin(dec_0*np.pi/180)*np.cos(stardec*np.pi/180)*np.cos(starra*np.pi/180 - ra_0*np.pi/180)\
         - np.cos(dec_0*np.pi/180)*np.sin(stardec*np.pi/180))/denom
@@ -119,7 +119,7 @@ def normalise_stars(normal):
     # return final
     return final.to_json()
 
-# normalise_planets([3,3,3])
+# print(normalise_planets([3,3,3]))
 # fig,ax = plt.subplots()
 # # ax.set_autoscale_on(False)
 # plt.axis('equal')
