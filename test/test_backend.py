@@ -34,4 +34,9 @@ def test_normalise():
     npt.assert_array_less(np.abs(list(pl['1'].values())), 1)
     npt.assert_array_less(np.abs(list(st['1'].values())), 1)
 
-test_normalise()
+    equivalent_normal = [2, 2, 2]
+    eq_pl = json.loads(testing.normalise_planets(equivalent_normal))
+    eq_st = json.loads(testing.normalise_stars(equivalent_normal))
+
+    npt.assert_almost_equal(list(pl['0'].values()), list(eq_pl['0'].values()))
+    npt.assert_almost_equal(list(st['0'].values()), list(eq_st['0'].values()))
