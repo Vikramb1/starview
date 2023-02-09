@@ -13,7 +13,9 @@ Future<getStar> fetchStar(String normal) async {
     // "Connection": "Keep-Alive",
     // "Keep-Alive": "timeout=1, max=1"
   };
-  final response = await http.get(url, headers: httpHeaders);
+  final response = await http
+      .get(url, headers: httpHeaders)
+      .timeout(Duration(milliseconds: 30));
 
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
@@ -32,7 +34,9 @@ Future<getPlanet> fetchPlanet(String normal) async {
     // "Connection": "Keep-Alive",
     // "Keep-Alive": "timeout=1, max=1"
   };
-  final response = await http.get(url, headers: httpHeaders);
+  final response = await http
+      .get(url, headers: httpHeaders)
+      .timeout(Duration(milliseconds: 30));
   // final response = await http
   //     .get(Uri.parse('http://10.0.2.2:5000/planets?normal=' + normal));
   if (response.statusCode == 200) {
@@ -124,7 +128,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Vector3 _absoluteOrientation = Vector3.zero();
-  int duration = 500;
+  int duration = 100;
   getStar? data;
   List<double> arr = [1, 1, 1];
   List<ScatterSpot>? spots;
@@ -238,18 +242,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     touchTooltipData: ScatterTouchTooltipData(
                       tooltipBgColor: Color.fromARGB(255, 184, 174, 174),
                       getTooltipItems: (ScatterSpot touchedBarSpot) {
-                        // print(touchedBarSpot.x);
-                        // int? nme = spots
-                        //     ?.where((z) => (z.x - touchedBarSpot.x).abs() <= 0)
-                        //     .map((z) => spots?.indexOf(z))
-                        //     .toList()[0];
                         int? nme = spots
                             ?.where((z) => (z.x - touchedBarSpot.x).abs() == 0)
                             .map((z) => spots?.indexOf(z))
                             .toList()[0];
                         int ind = nme ?? labels.length - 1;
-                        // print(ind);
                         value = labels[ind];
+                        selected_spots = [];
                         return ScatterTooltipItem(
                           value,
                           textStyle: TextStyle(
@@ -278,7 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
                       }
                     })),
-            swapAnimationDuration: Duration(milliseconds: 30),
+            swapAnimationDuration: Duration(milliseconds: 1),
           ),
         ));
     // );
