@@ -8,14 +8,15 @@ import 'dart:convert';
 import 'dart:async';
 
 Future<getStar> fetchStar(String normal) async {
-  final url = Uri.parse('http://10.0.2.2:5000/stars?normal=' + normal);
+  final url = Uri.parse('http://192.168.0.33:5000/stars?normal=' + normal);
+  // print(url);
   final Map<String, String> httpHeaders = {
     // "Connection": "Keep-Alive",
     // "Keep-Alive": "timeout=1, max=1"
   };
   final response = await http
       .get(url, headers: httpHeaders)
-      .timeout(Duration(milliseconds: 30));
+      .timeout(Duration(milliseconds: 200));
 
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
@@ -29,14 +30,15 @@ Future<getStar> fetchStar(String normal) async {
 }
 
 Future<getPlanet> fetchPlanet(String normal) async {
-  final url = Uri.parse('http://10.0.2.2:5000/planets?normal=' + normal);
+  final url = Uri.parse('http://192.168.0.33:5000/planets?normal=' + normal);
+  // print(url);
   final Map<String, String> httpHeaders = {
     // "Connection": "Keep-Alive",
     // "Keep-Alive": "timeout=1, max=1"
   };
   final response = await http
       .get(url, headers: httpHeaders)
-      .timeout(Duration(milliseconds: 30));
+      .timeout(Duration(milliseconds: 200));
   // final response = await http
   //     .get(Uri.parse('http://10.0.2.2:5000/planets?normal=' + normal));
   if (response.statusCode == 200) {
@@ -143,17 +145,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void getData() async {
+    // print(await motionSensors.isOrientationAvailable());
     motionSensors.absoluteOrientation.listen((AbsoluteOrientationEvent event) {
       setState(() {
-        _absoluteOrientation.setValues(event.yaw, event.pitch, event.roll);
+        _absoluteOrientation.setValues(event.roll, event.pitch, event.yaw);
       });
     });
     _absoluteOrientation.copyIntoArray(arr, 0);
     List<String> t = arr.map((el) => el.toString()).toList();
+    // print(t.join(':'));
+    // print('...');
     getStar data = await fetchStar(t.join(':'));
     getPlanet data2 = await fetchPlanet(t.join(':'));
     spots = plottedData(data, data2);
-    // print('called');
+    // print(data.name.values.toList());
   }
 
   List<ScatterSpot>? plottedData(var data, var data2) {
@@ -164,8 +169,8 @@ class _MyHomePageState extends State<MyHomePage> {
               data?.x.values.toList()[index], data?.y.values.toList()[index],
               color: Color.fromARGB(255, 255, 255, 255),
               radius: (4.5 - data?.mag.values.toList()[index]).toDouble()));
-      // m.add(ScatterSpot(-0.7, 1, show: false));
-      // m.add(ScatterSpot(0.7, -1, show: false));
+      m.add(ScatterSpot(-0.7, 1, show: false));
+      m.add(ScatterSpot(0.7, -1, show: false));
       var planetsCol = {
         'mercury': Color.fromARGB(255, 219, 206, 202),
         'venus': Color.fromARGB(255, 165, 124, 27),
@@ -200,7 +205,10 @@ class _MyHomePageState extends State<MyHomePage> {
       List<dynamic> a2 = data2?.name.values.toList();
       labels = a1 + a2;
       labels.add('Unknown');
-      List<ScatterSpot> combined = m + p;
+      List<ScatterSpot> e = [...m];
+      e.removeLast();
+      e.removeLast();
+      List<ScatterSpot> combined = e + p;
       return combined;
     } else {
       return null;
@@ -277,7 +285,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
                       }
                     })),
-            swapAnimationDuration: Duration(milliseconds: 1),
+            swapAnimationDuration: Duration(milliseconds: 0),
           ),
         ));
     // );

@@ -59,8 +59,7 @@ def update_data():
 
     return 0
 
-def normalise_planets(normal):
-    planet_pass = pd.read_json('planets.json')
+def normalise_planets(normal, planet_pass):
     planetra = planet_pass.ra
     planetdec = planet_pass.dec
     planet_pass['Name'] = planet_pass.index
@@ -81,8 +80,7 @@ def normalise_planets(normal):
     final = final[(abs(final[0]) < 1) & (abs(final[1]) < 1)]
     return final.to_json()
 
-def normalise_stars(normal):
-    star_pass = pd.read_json('stars.json')
+def normalise_stars(normal, star_pass):
     # normal = np.array(normal)
     # normal = normal + min(normal)
     # normal /= sum(normal)

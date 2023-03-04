@@ -62,56 +62,67 @@ List<ScatterSpot>? plottedData(var data, var data2) {
 }
 
 void main() {
-  void testValidResponse() async {
-    final url = Uri.parse('http://10.0.2.2:5000/stars?normal=1:1:1');
-    final response = await http.get(url).timeout(Duration(milliseconds: 30));
-    expect(response.statusCode, 200);
-  }
+  test('testValidResponse', () async {
+    void testValidResponse() async {
+      final url = Uri.parse('http://10.0.2.2:5000/stars?normal=1:1:1');
+      final response = await http.get(url).timeout(Duration(milliseconds: 30));
+      expect(response.statusCode, 200);
+    }
+  });
 
-  void testErrorResponse() async {
-    final url = Uri.parse('http://10.0.2.2:5000/stars?normal=1:1:1');
-    final response = await http.get(url).timeout(Duration(milliseconds: 30));
-    expect(response.statusCode, isNot(equals(200)));
-    expect(() => throw Exception('Failed to load star data'), throwsException);
-  }
+  test('testErrorResponse', () async {
+    void testErrorResponse() async {
+      final url = Uri.parse('http://10.0.2.2:5000/stars?normal=1:1:1');
+      final response = await http.get(url).timeout(Duration(milliseconds: 30));
+      expect(response.statusCode, isNot(equals(200)));
+      expect(
+          () => throw Exception('Failed to load star data'), throwsException);
+    }
+  });
 
-  void testDataParsing() {
-    Map<String, dynamic> json = {
-      '0': 0.5,
-      '1': 1.2,
-      'Name': 'testStar',
-      'magnitude': 3.4,
-    };
-    getStar testStar = getStar.fromJson(json);
-    expect(testStar.x, 0.5);
-    expect(testStar.y, 1.2);
-    expect(testStar.name, 'testStar');
-    expect(testStar.mag, 3.4);
-    expect(testStar.length, 4);
-  }
+  test('testDataParsing', () {
+    void testDataParsing() {
+      Map<String, dynamic> json = {
+        '0': 0.5,
+        '1': 1.2,
+        'Name': 'testStar',
+        'magnitude': 3.4,
+      };
+      getStar testStar = getStar.fromJson(json);
+      expect(testStar.x, 0.5);
+      expect(testStar.y, 1.2);
+      expect(testStar.name, 'testStar');
+      expect(testStar.mag, 3.4);
+      expect(testStar.length, 4);
+    }
+  });
 
-  void testDataPlotting() {
-    List<ScatterSpot> spots = [
-      ScatterSpot(0.5, 1.2,
-          color: Color.fromARGB(255, 255, 255, 255), radius: 0.5),
-      ScatterSpot(-0.7, 1, show: false),
-      ScatterSpot(0.7, -1, show: false)
-    ];
-    expect(plottedData(spots, spots), isNotNull);
-    expect(spots[0].x, 0.5);
-    expect(spots[0].y, 1.2);
-    expect(spots[0].color, Color.fromARGB(255, 255, 255, 255));
-    expect(spots[0].radius, 0.5);
-    expect(spots[1].show, false);
-    expect(spots[2].show, false);
-  }
+  test('testDataPlotting', () {
+    void testDataPlotting() {
+      List<ScatterSpot> spots = [
+        ScatterSpot(0.5, 1.2,
+            color: Color.fromARGB(255, 255, 255, 255), radius: 0.5),
+        ScatterSpot(-0.7, 1, show: false),
+        ScatterSpot(0.7, -1, show: false)
+      ];
+      expect(plottedData(spots, spots), isNotNull);
+      expect(spots[0].x, 0.5);
+      expect(spots[0].y, 1.2);
+      expect(spots[0].color, Color.fromARGB(255, 255, 255, 255));
+      expect(spots[0].radius, 0.5);
+      expect(spots[1].show, false);
+      expect(spots[2].show, false);
+    }
+  });
 
-  void testLabelsGeneration() {
-    List<dynamic> labels = [];
-    List<dynamic> a1 = ['star1', 'star2'];
-    List<dynamic> a2 = ['planet1', 'planet2'];
-    labels = a1 + a2;
-    labels.add('Unknown');
-    expect(labels, ['star1', 'star2', 'planet1', 'planet2', 'Unknown']);
-  }
+  test('testLabelsGeneration', () {
+    void testLabelsGeneration() {
+      List<dynamic> labels = [];
+      List<dynamic> a1 = ['star1', 'star2'];
+      List<dynamic> a2 = ['planet1', 'planet2'];
+      labels = a1 + a2;
+      labels.add('Unknown');
+      expect(labels, ['star1', 'star2', 'planet1', 'planet2', 'Unknown']);
+    }
+  });
 }
