@@ -7,6 +7,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'dart:convert';
 import 'dart:async';
 
+var client = http.Client();
+
 Future<getStar> fetchStar(String normal) async {
   final url = Uri.parse('http://192.168.0.33:5000/stars?normal=' + normal);
   // print(url);
@@ -14,7 +16,7 @@ Future<getStar> fetchStar(String normal) async {
     // "Connection": "Keep-Alive",
     // "Keep-Alive": "timeout=1, max=1"
   };
-  final response = await http
+  final response = await client
       .get(url, headers: httpHeaders)
       .timeout(Duration(milliseconds: 200));
 
@@ -36,7 +38,7 @@ Future<getPlanet> fetchPlanet(String normal) async {
     // "Connection": "Keep-Alive",
     // "Keep-Alive": "timeout=1, max=1"
   };
-  final response = await http
+  final response = await client
       .get(url, headers: httpHeaders)
       .timeout(Duration(milliseconds: 200));
   // final response = await http
@@ -130,7 +132,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Vector3 _absoluteOrientation = Vector3.zero();
-  int duration = 100;
+  int duration = 400;
   getStar? data;
   List<double> arr = [1, 1, 1];
   List<ScatterSpot>? spots;
@@ -145,10 +147,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void getData() async {
-    // print(await motionSensors.isOrientationAvailable());
     motionSensors.absoluteOrientation.listen((AbsoluteOrientationEvent event) {
       setState(() {
-        _absoluteOrientation.setValues(event.roll, event.pitch, event.yaw);
+        _absoluteOrientation.setValues(event.yaw, event.pitch, event.roll);
       });
     });
     _absoluteOrientation.copyIntoArray(arr, 0);
@@ -251,7 +252,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       tooltipBgColor: Color.fromARGB(255, 184, 174, 174),
                       getTooltipItems: (ScatterSpot touchedBarSpot) {
                         int? nme = spots
-                            ?.where((z) => (z.x - touchedBarSpot.x).abs() == 0)
+                            ?.where(
+                                (z) => (z.x - touchedBarSpot.x).abs() == 0.01)
                             .map((z) => spots?.indexOf(z))
                             .toList()[0];
                         int ind = nme ?? labels.length - 1;
@@ -285,7 +287,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
                       }
                     })),
-            swapAnimationDuration: Duration(milliseconds: 0),
+            swapAnimationDuration: Duration(milliseconds: 5),
           ),
         ));
     // );
